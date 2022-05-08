@@ -56,7 +56,12 @@ Encore
     })
 
     // enables Sass/SCSS support
-    //.enableSassLoader()
+    .enableSassLoader()
+    .enableVueLoader(() => {}, {
+        runtimeCompilerBuild: false,
+        version: 3
+    })
+
 
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
@@ -71,5 +76,28 @@ Encore
     // uncomment if you're having problems with a jQuery plugin
     //.autoProvidejQuery()
 ;
-
+if (Encore.isDevServer()) {
+    Encore.configureLoaderRule('sass', (rule) => {
+        if (rule.oneOf) {
+            rule.oneOf.map((one, key) => {
+                one.use.map((use, useKey) => {
+                    if (typeof use === 'string' && /[\\\/]mini\-css\-extract\-plugin[\\\/]/.test(use)) {
+                        rule.oneOf[key].use[useKey] = 'vue-style-loader';
+                    }
+                });
+            });
+        }
+    });
+    Encore.configureLoaderRule('css', (rule) => {
+        if (rule.oneOf) {
+            rule.oneOf.map((one, key) => {
+                one.use.map((use, useKey) => {
+                    if (typeof use === 'string' && /[\\\/]mini\-css\-extract\-plugin[\\\/]/.test(use)) {
+                        rule.oneOf[key].use[useKey] = 'vue-style-loader';
+                    }
+                });
+            });
+        }
+    });
+}
 module.exports = Encore.getWebpackConfig();
